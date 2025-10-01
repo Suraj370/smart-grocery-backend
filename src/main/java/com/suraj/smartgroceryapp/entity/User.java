@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
+
+@Entity
 @Data
 @Table(name = "user")
 @NoArgsConstructor
@@ -30,4 +32,23 @@ public class User {
     private Instant createdAt;
 
     private Instant updatedAt;
+
+    // --- JPA LIFECYCLE CALLBACKS ---
+
+    /**
+     * Sets createdAt and updatedAt before the entity is persisted (saved for the first time).
+     */
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    /**
+     * Sets updatedAt before the entity is updated (saved after the first time).
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
 }

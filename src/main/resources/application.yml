@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: smart grocery
+  autoconfigure:
+    exclude: org.springframework.ai.model.vertexai.autoconfigure.gemini.VertexAiGeminiChatAutoConfiguration
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+security:
+  jwt:
+    secret: ${jwt_key}

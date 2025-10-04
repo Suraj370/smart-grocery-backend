@@ -13,5 +13,6 @@ public interface GroceryService {
 
     Optional<GroceryList> getListById(Long listId);
     List<GroceryList> getListsByOwner(String ownerUid);
-    GroceryList addItemtoList(Long listId, String ownerUid, GroceryItemDTO newItem);
+    GroceryList addItemToList(Long listId, String ownerUid, GroceryItemDTO newItem);
+    void deleteItemFromList(Long listId, Long itemId, String ownerUid);
 }

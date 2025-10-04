@@ -32,7 +32,7 @@ public class GroceryServiceImpl implements GroceryService{
 
     @Override
     public List<GroceryList> getListsByOwner(String ownerUid) {
-        return List.of();
+        return groceryListRepository.findAllByOwnerUid(ownerUid);
     }
 
     /**
@@ -44,11 +44,11 @@ public class GroceryServiceImpl implements GroceryService{
      * @param itemDTO The new GroceryItem to add.
      * @return The updated or newly created GroceryList.
      */
-    // Corrected addItemtoList service method
+
 
     @Override
     @Transactional
-    public GroceryList addItemtoList(Long listId, String ownerUid, GroceryItemDTO itemDTO) {
+    public GroceryList addItemToList(Long listId, String ownerUid, GroceryItemDTO itemDTO) {
         GroceryList existingList;
         if (listId != null) {
             // Find existing list
@@ -84,5 +84,42 @@ public class GroceryServiceImpl implements GroceryService{
         // Save the list. Due to CascadeType.ALL, this will automatically save the new item
         // and correctly set the foreign key.
         return groceryListRepository.save(existingList);
+    }
+
+    /**
+     * Deletes a specific item from a grocery list, provided the authenticated
+     * user is the owner of the list.
+     *
+     * @param listId The ID of the {@link com.suraj.smartgroceryapp.entity.GroceryList} from which
+     * the item will be deleted.
+     * @param itemId The ID of the {@link com.suraj.smartgroceryapp.entity.GroceryItem} to be
+     * removed.
+     * @param ownerUid The unique identifier of the user who owns the list,
+     * typically retrieved from the authenticated {@link java.security.Principal}.
+     * @see com.suraj.smartgroceryapp.entity.GroceryList
+     * @see com.suraj.smartgroceryapp.entity.GroceryItem
+     */
+    @Override
+    @Transactional
+    public void deleteItemFromList(Long listId, Long itemId, String ownerUid) {
+        // 1. Find the list and the item.
+        GroceryList groceryList = getListById(listId)
+                .orElseThrow(() -> new RuntimeException("Grocery list not found with ID: " + listId));
+
+        // 2. Verify that the user is the owner of the list.
+        if (!groceryList.getOwnerUid().equals(ownerUid)) {
+            throw new RuntimeException("User does not have permission to modify this list.");
+        }
+
+        // 3. Find the item to be deleted from the list's items.
+        GroceryItem itemToDelete = groceryList.getItems().stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Item not found in the specified list."));
+
+        // 4. Remove the item from the list's collection.
+        // Because of `orphanRemoval = true` in GroceryList,
+        // JPA will automatically delete the item from the database when the list is saved.
+        groceryList.getItems().remove(itemToDelete);
     }
 }

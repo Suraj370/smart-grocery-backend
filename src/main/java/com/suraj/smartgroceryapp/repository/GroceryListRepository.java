@@ -1,6 +1,7 @@
 package com.suraj.smartgroceryapp.repository;
 
 import com.suraj.smartgroceryapp.entity.GroceryList;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +19,7 @@ public interface GroceryListRepository extends JpaRepository<GroceryList, Long> 
      * @param ownerUid The unique ID of the list owner.
      * @return A list of GroceryList entities.
      */
+    @EntityGraph(attributePaths = "items")
+
     List<GroceryList> findAllByOwnerUid(String ownerUid);
 }

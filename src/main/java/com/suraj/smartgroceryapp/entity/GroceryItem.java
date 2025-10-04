@@ -1,5 +1,6 @@
 package com.suraj.smartgroceryapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,9 +40,31 @@ public class GroceryItem {
      * @ManyToOne defines the relationship.
      * @JoinColumn specifies the Foreign Key column name in the 'grocery_item' table.
      */
+    // In GroceryItem.java
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "list_id", nullable = false) // FK column name is 'list_id'
-    private GroceryList list; // Reference to the parent list entity
+    @JoinColumn(name = "list_id", nullable = false)
+    @JsonBackReference // Add this annotation
+    private GroceryList list;
+
+    // --- JPA LIFECYCLE CALLBACKS ---
+
+    /**
+     * Sets createdAt and updatedAt before the entity is persisted (saved for the first time).
+     */
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    /**
+     * Sets updatedAt before the entity is updated (saved after the first time).
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
 }
 
 

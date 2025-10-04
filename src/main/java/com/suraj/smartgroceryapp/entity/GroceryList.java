@@ -1,17 +1,20 @@
 package com.suraj.smartgroceryapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Represents the current active grocery list.
  * It establishes the One-to-Many relationship with GroceryItem.
  */
+
 @Entity
 @Table(name = "grocery_list")
 @Data
@@ -26,20 +29,12 @@ public class GroceryList {
     @Column(nullable = false)
     private String name;
 
-    /**
-     * Foreign Key to the User entity (User.uid).
-     * This is the mechanism for ownership authorization.
-     */
     @Column(nullable = false)
     private String ownerUid;
 
-    /**
-     * Relationship Mapping: A single list can have many items.
-     * 'mappedBy' references the 'list' field in the child (GroceryItem) entity.
-     * CascadeType.ALL ensures items are saved/deleted with the list.
-     */
     @OneToMany(mappedBy = "list", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<GroceryItem> items;
+    @JsonManagedReference // Add this annotation
+    private List<GroceryItem> items = new ArrayList<>();
 
     @Column(updatable = false, nullable = false)
     private Instant createdAt;
@@ -49,4 +44,15 @@ public class GroceryList {
 
     @Column(nullable = false)
     private boolean isCompleted;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Instant.now();
+    }
 }

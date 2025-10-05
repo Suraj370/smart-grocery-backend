@@ -20,6 +20,5 @@ public interface GroceryListRepository extends JpaRepository<GroceryList, Long> 
      * @return A list of GroceryList entities.
      */
     @EntityGraph(attributePaths = "items")
-
     List<GroceryList> findAllByOwnerUid(String ownerUid);
 }

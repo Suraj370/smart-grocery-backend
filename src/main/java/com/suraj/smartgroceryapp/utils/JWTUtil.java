@@ -23,10 +23,10 @@ public class JWTUtil {
 
     public String extractUsername(String token) {
         return Jwts.parser()
-                .setSigningKey(getSignedKey())
+                .verifyWith(getSignedKey())
                 .build()
-                .parseClaimsJws(token)   // ✅ explicitly for signed JWTs (JWS)
-                .getBody()
+                .parseSignedClaims(token)   // ✅ explicitly for signed JWTs (JWS)
+                .getPayload()
                 .getSubject();
     }
 
@@ -41,10 +41,10 @@ public class JWTUtil {
 
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parser()
-                .setSigningKey(getSignedKey())
+                .verifyWith(getSignedKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getExpiration();
         return expiration.before(new Date());
     }
@@ -55,11 +55,11 @@ public class JWTUtil {
         Date expiration = new Date(issuedAt.getTime() + expirationMillis);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
-                .setIssuedAt(issuedAt)
-                .setExpiration(expiration)
-                .signWith(getSignedKey(), SignatureAlgorithm.HS256) // ✅ explicit algo
+                .claims(claims)
+                .subject(username)
+                .issuedAt(issuedAt)
+                .expiration(expiration)
+                .signWith(getSignedKey())
                 .compact();
     }
 }

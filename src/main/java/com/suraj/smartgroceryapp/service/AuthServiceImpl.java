@@ -4,6 +4,7 @@ package com.suraj.smartgroceryapp.service;
 import com.suraj.smartgroceryapp.dto.SigninRequest;
 import com.suraj.smartgroceryapp.dto.SigninResponse;
 import com.suraj.smartgroceryapp.dto.SignupRequest;
+import com.suraj.smartgroceryapp.dto.UserResponse;
 import com.suraj.smartgroceryapp.entity.User;
 import com.suraj.smartgroceryapp.repository.UserRepository;
 import com.suraj.smartgroceryapp.utils.JWTUtil;
@@ -75,7 +76,8 @@ public class AuthServiceImpl  implements  AuthService {
             String token = jwtUtil.generateToken(claims, user.getEmail());
 
             // 4. Return the token and the user details in the LoginResponse DTO
-            return new SigninResponse(token, user);
+            UserResponse userResponse = UserResponse.fromUser(user);
+            return new SigninResponse(token, userResponse);
         } else {
             throw new RuntimeException("Error: Invalid username or password!");
         }
